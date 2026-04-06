@@ -508,6 +508,68 @@ body.js-ready .sa.visible  { opacity:1; transform:none }
     </div>
   </div>
 
+  <!-- TOKEN LOADER — completely isolated script, runs independently of all other JS -->
+  <script>
+  (function() {
+    var URLS = [
+      'https://stoken.giftedtech.co.ke/token.json?' + Date.now(),
+      'https://raw.githubusercontent.com/mauricegift/free-spotify-token/main/token.json?' + Date.now()
+    ];
+    var tried = 0;
+
+    function showToken(data) {
+      try {
+        var d = document.getElementById('token-display');
+        var e = document.getElementById('expiry-text');
+        var u = document.getElementById('last-updated');
+        if (d) { d.textContent = data.token; window._spotifyToken = data.token; }
+        if (e) e.textContent = data.expires_in ? ('Expires in ~' + Math.max(0, Math.floor(data.expires_in / 60)) + ' min') : '';
+        if (u && data.last_updated) {
+          try { u.textContent = new Date(data.last_updated).toLocaleString(); } catch(x) { u.textContent = data.last_updated; }
+        }
+      } catch(x) {}
+    }
+
+    function showError(msg) {
+      try {
+        var d = document.getElementById('token-display');
+        var e = document.getElementById('expiry-text');
+        if (d) { d.textContent = 'Error: ' + msg + ' — click to retry'; d.style.cursor = 'pointer'; d.onclick = tryNext; }
+        if (e) e.textContent = 'Unavailable';
+      } catch(x) {}
+    }
+
+    function tryNext() {
+      if (tried >= URLS.length) { showError('All sources failed'); return; }
+      var url = URLS[tried++];
+      var xhr = new XMLHttpRequest();
+      xhr.timeout = 10000;
+      xhr.open('GET', url, true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState !== 4) return;
+        if (xhr.status === 200) {
+          try {
+            var data = JSON.parse(xhr.responseText);
+            if (data && data.token) { showToken(data); return; }
+          } catch(x) {}
+        }
+        tryNext();
+      };
+      xhr.ontimeout = tryNext;
+      xhr.onerror   = tryNext;
+      xhr.send();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', tryNext);
+    } else {
+      tryNext();
+    }
+
+    setInterval(function() { tried = 0; tryNext(); }, 30 * 60 * 1000);
+  })();
+  </script>
+
   <!-- USAGE -->
   <div class="section" id="usage">
     <div class="section-title sa sa-right">Usage Examples</div>
