@@ -1,58 +1,95 @@
-## Free Spotify Tokens
+# free-spotify-token
 
-This repository automatically provides updated every 30 minutes  
-You can use these tokens to interact with Spotify's public APIs **without needing your own Client ID or Secret**, and **without any special rate limits** for typical usage.
+> **1 fresh Spotify access token** — updated every **20 minutes**
 
----
+A free, continuously refreshed **Spotify Web Player access token** — no login, no API keys, no cost. Works with all public Spotify API endpoints. Powered by a reverse-engineered TOTP flow identical to the official web player.
 
-## Access Tokens Url
+![Token](https://img.shields.io/badge/Token-1-1DB954?style=flat-square&logo=spotify&logoColor=white)
+![Interval](https://img.shields.io/badge/Refresh-20min-blue?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Live-brightgreen?style=flat-square)
 
-The latest Spotify access tokens are always available at:
-
-   ```
-   https://raw.githubusercontent.com/mauricegift/free-spotify-tokens/refs/heads/main/tokens.json
-
-   ```
+🌐 Live Dashboard: [stoken.giftedtech.co.ke](https://stoken.giftedtech.co.ke)
 
 ---
 
-## Usage Example
+## Token JSON
 
-```javascript
-const axios = require('axios');
-// import axios from 'axios';
+```
+https://stoken.giftedtech.co.ke/tokens.json
+```
 
-(async () => {
-  try {
-    const { data } = await axios.get(
-      'https://raw.githubusercontent.com/mauricegift/free-spotify-tokens/refs/heads/main/tokens.json'
-    );
-   // You can pick any from list
-    const accessToken = data.tokens?.[0]?.access_token;
+### Structure
 
-    if (!accessToken) {
-      throw new Error('No access token found');
-    }
-
-    const response = await axios.get('https://api.spotify.com/v1/albums/4aawyAB9vmqN3uQ7FjRGTy', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    });
-
-    console.log(response.data);
-  } catch (err) {
-    console.error('Error:', err.message || err);
-  }
-})();
-
+```json
+{
+  "token": "BQC...",
+  "expires_in": 3600,
+  "last_updated": "2026-04-06T03:10:49.000Z"
+}
 ```
 
 ---
 
-## ⚠️ Disclaimer
+## Usage
 
-- This project is intended for **educational and personal use**.
-- This project is **not affiliated with Spotify** in any way.
+### JavaScript / Node.js
+
+```js
+const res = await fetch('https://stoken.giftedtech.co.ke/tokens.json');
+const { token } = await res.json();
+
+const data = await fetch('https://api.spotify.com/v1/browse/new-releases', {
+  headers: { Authorization: `Bearer ${token}` }
+}).then(r => r.json());
+```
+
+### Python
+
+```python
+import requests
+
+res = requests.get('https://stoken.giftedtech.co.ke/tokens.json').json()
+token = res['token']
+
+data = requests.get(
+    'https://api.spotify.com/v1/browse/new-releases',
+    headers={'Authorization': f'Bearer {token}'}
+).json()
+```
+
+### cURL
+
+```bash
+TOKEN=$(curl -s https://stoken.giftedtech.co.ke/tokens.json | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
+curl -H "Authorization: Bearer $TOKEN" https://api.spotify.com/v1/browse/new-releases
+```
 
 ---
+
+## Supported Endpoints
+
+Works with any **public** Spotify API endpoint, including:
+
+| Endpoint | Description |
+|---|---|
+| `/v1/search` | Search tracks, albums, artists, playlists |
+| `/v1/browse/new-releases` | New album releases |
+| `/v1/browse/featured-playlists` | Featured playlists |
+| `/v1/browse/categories` | Browse categories |
+| `/v1/albums/{id}` | Album details |
+| `/v1/artists/{id}` | Artist details |
+| `/v1/tracks/{id}` | Track details |
+| `/v1/recommendations` | Track recommendations |
+| `/v1/audio-features/{id}` | Audio analysis |
+
+---
+
+## Notes
+
+- Token expires roughly **1 hour** after issue but is refreshed every **20 minutes** so it's always fresh
+- This is an **anonymous web-player token** — user-specific endpoints (liked songs, playlists) require OAuth login
+- Runs 24/7 on a VPS by [Gifted Tech](https://giftedtech.co.ke)
+
+---
+
+*Made with ♥ by [mauricegift](https://github.com/mauricegift)*
