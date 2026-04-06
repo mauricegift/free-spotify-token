@@ -5,7 +5,7 @@
 A free, continuously refreshed **Spotify Web Player access token** — no login, no API keys, no cost. Works with all public Spotify API endpoints. Powered by a reverse-engineered TOTP flow identical to the official web player.
 
 ![Token](https://img.shields.io/badge/Token-1-1DB954?style=flat-square&logo=spotify&logoColor=white)
-![Interval](https://img.shields.io/badge/Refresh-20min-blue?style=flat-square)
+![Interval](https://img.shields.io/badge/Refresh-30min-blue?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Live-brightgreen?style=flat-square)
 
 🌐 Live Dashboard: [stoken.giftedtech.co.ke](https://stoken.giftedtech.co.ke)
