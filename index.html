@@ -352,21 +352,19 @@ footer a{color:var(--green);text-decoration:none;font-weight:500}
 footer a:hover{text-decoration:underline}
 
 /* ══ SCROLL ANIMATIONS ═══════════════════════════════════════════════════
-   All sa-* elements start invisible and transition in when .visible is added.
-   IntersectionObserver adds/removes .visible as you scroll up and down.
+   Elements are VISIBLE by default. JS adds body.js-ready ONLY after the
+   IntersectionObserver is set up, so nothing is ever stuck invisible.
 ══════════════════════════════════════════════════════════════════════════ */
-.sa{
-  opacity:0;
-  transition:opacity .6s ease, transform .6s ease;
-  will-change:opacity,transform;
-}
-.sa.sa-up    { transform:translateY(44px) }
-.sa.sa-down  { transform:translateY(-30px) }
-.sa.sa-right { transform:translateX(-44px) }
-.sa.sa-left  { transform:translateX(44px) }
-.sa.sa-zoom  { transform:scale(.86) }
-.sa.sa-flip  { transform:perspective(600px) rotateY(-45deg); transform-origin:left center }
-.sa.visible  { opacity:1; transform:none }
+.sa{ transition:opacity .6s ease, transform .6s ease; will-change:opacity,transform; }
+
+body.js-ready .sa           { opacity:0 }
+body.js-ready .sa.sa-up    { transform:translateY(44px) }
+body.js-ready .sa.sa-down  { transform:translateY(-30px) }
+body.js-ready .sa.sa-right { transform:translateX(-44px) }
+body.js-ready .sa.sa-left  { transform:translateX(44px) }
+body.js-ready .sa.sa-zoom  { transform:scale(.86) }
+body.js-ready .sa.sa-flip  { transform:perspective(600px) rotateY(-45deg); transform-origin:left center }
+body.js-ready .sa.visible  { opacity:1; transform:none }
 
 .sa-d1{ transition-delay:.07s }
 .sa-d2{ transition-delay:.15s }
@@ -730,21 +728,23 @@ resize(); initDots(); drawFrame();
 window.addEventListener('resize', () => { resize(); initDots(); });
 
 // ══ SCROLL ANIMATIONS (IntersectionObserver) ══════════════════════════════
-// Elements with class "sa" start at opacity:0 + transform.
-// Observer adds "visible" when they enter viewport → CSS transition animates in.
-// Observer removes "visible" when they leave → animates back out (mirror effect).
+// body.js-ready is added FIRST so the CSS hides elements.
+// The observer immediately calls back for any element already in view,
+// adding .visible before the first paint — so nothing is ever blank.
 (function() {
+  const els = Array.from(document.querySelectorAll('.sa'));
+  if (!els.length) return;
+
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      } else {
-        entry.target.classList.remove('visible');
-      }
+      entry.target.classList.toggle('visible', entry.isIntersecting);
     });
-  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0.08 });
 
-  document.querySelectorAll('.sa').forEach(el => observer.observe(el));
+  // Mark body ready THEN observe — browser fires callbacks synchronously
+  // for elements already intersecting before the next paint.
+  document.body.classList.add('js-ready');
+  els.forEach(el => observer.observe(el));
 })();
 
 // ══ TOKEN FETCH ═══════════════════════════════════════════════════════════
