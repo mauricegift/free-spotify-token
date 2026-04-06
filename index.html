@@ -474,6 +474,11 @@ footer a:hover { text-decoration: underline; }
   th, td { padding: 10px 12px; }
 }
 @media(min-width:641px) { .hamburger { display: none !important; } }
+
+/* ── AOS safety: never leave content permanently invisible ── */
+[data-aos] { pointer-events: auto !important; }
+html:not(.aos-initialized) [data-aos],
+[data-aos].aos-animate { opacity: 1 !important; transform: none !important; }
 </style>
 </head>
 <body>
@@ -517,7 +522,7 @@ footer a:hover { text-decoration: underline; }
     <a class="sidebar-link" href="token.json" target="_blank" onclick="closeSidebar()">
       <i class="fas fa-file-code"></i> token.json
     </a>
-    <a class="sidebar-link" href="https://giftedtech.co.ke" target="_blank" rel="noopener" onclick="closeSidebar()">
+    <a class="sidebar-link" href="https://me.giftedtech.co.ke" target="_blank" rel="noopener" onclick="closeSidebar()">
       <i class="fas fa-globe"></i> Gifted Tech
     </a>
   </div>
@@ -748,7 +753,7 @@ TOKEN=$(<span class="fn">curl</span> -s https://stoken.giftedtech.co.ke/token.js
     </div>
     <div class="note-card" data-aos="flip-left" data-aos-duration="500" data-aos-delay="160">
       <i class="fas fa-server"></i>
-      <div>Runs 24/7 on a dedicated VPS by <a href="https://giftedtech.co.ke" target="_blank" rel="noopener" style="color:var(--green)">Gifted Tech</a>. Check <a href="https://github.com/mauricegift/free-spotify-token" target="_blank" rel="noopener" style="color:var(--green)">GitHub</a> for uptime and commit history.</div>
+      <div>Runs 24/7 on a dedicated VPS by <a href="https://me.giftedtech.co.ke" target="_blank" rel="noopener" style="color:var(--green)">Gifted Tech</a>. Check <a href="https://github.com/mauricegift/free-spotify-token" target="_blank" rel="noopener" style="color:var(--green)">GitHub</a> for uptime and commit history.</div>
     </div>
   </div>
 
@@ -760,7 +765,7 @@ TOKEN=$(<span class="fn">curl</span> -s https://stoken.giftedtech.co.ke/token.js
     Built &amp; maintained by
     <a href="https://github.com/mauricegift" target="_blank" rel="noopener">mauricegift</a>
     ·
-    <a href="https://giftedtech.co.ke" target="_blank" rel="noopener">Gifted Tech</a>
+    <a href="https://me.giftedtech.co.ke" target="_blank" rel="noopener">Gifted Tech</a>
   </p>
   <p style="margin-top:8px;font-size:.78rem;opacity:.7;">
     Token auto-refreshes every 20 min ·
@@ -882,8 +887,9 @@ AOS.init({
   duration: 600,
   once: false,
   mirror: true,
-  offset: 60,
+  offset: 0,
   easing: 'ease-out-cubic',
+  startEvent: 'DOMContentLoaded',
 });
 
 // ══════════════════════════════════════════════════════════
