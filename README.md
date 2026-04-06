@@ -15,7 +15,7 @@ A free, continuously refreshed **Spotify Web Player access token** — no login,
 ## Token JSON
 
 ```
-https://stoken.giftedtech.co.ke/tokens.json
+https://stoken.giftedtech.co.ke/token.json
 ```
 
 ### Structure
@@ -23,6 +23,7 @@ https://stoken.giftedtech.co.ke/tokens.json
 ```json
 {
   "token": "BQC...",
+  "token_type": "Bearer",
   "expires_in": 3600,
   "last_updated": "2026-04-06T03:10:49.000Z"
 }
@@ -35,7 +36,7 @@ https://stoken.giftedtech.co.ke/tokens.json
 ### JavaScript / Node.js
 
 ```js
-const res = await fetch('https://stoken.giftedtech.co.ke/tokens.json');
+const res = await fetch('https://stoken.giftedtech.co.ke/token.json');
 const { token } = await res.json();
 
 const data = await fetch('https://api.spotify.com/v1/browse/new-releases', {
@@ -48,7 +49,7 @@ const data = await fetch('https://api.spotify.com/v1/browse/new-releases', {
 ```python
 import requests
 
-res = requests.get('https://stoken.giftedtech.co.ke/tokens.json').json()
+res = requests.get('https://stoken.giftedtech.co.ke/token.json').json()
 token = res['token']
 
 data = requests.get(
@@ -60,7 +61,7 @@ data = requests.get(
 ### cURL
 
 ```bash
-TOKEN=$(curl -s https://stoken.giftedtech.co.ke/tokens.json | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
+TOKEN=$(curl -s https://stoken.giftedtech.co.ke/token.json | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
 curl -H "Authorization: Bearer $TOKEN" https://api.spotify.com/v1/browse/new-releases
 ```
 
