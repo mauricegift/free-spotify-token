@@ -860,12 +860,32 @@ async function loadToken() {
 loadToken();
 setInterval(loadToken, 30 * 60 * 1000);
 
+// ══ COPY HELPER (clipboard API → execCommand fallback) ═══════════════════
+function copyText(text, onDone) {
+  if (!text) return;
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(onDone).catch(() => execCopy(text, onDone));
+  } else {
+    execCopy(text, onDone);
+  }
+}
+function execCopy(text, onDone) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  if (onDone) onDone();
+}
+
 // ══ COPY TOKEN ════════════════════════════════════════════════════════════
 function copyToken() {
   var tok = currentToken || window._spotifyToken || '';
   if (!tok) return;
-  navigator.clipboard.writeText(tok).then(() => {
-    const btn = document.getElementById('copy-btn');
+  const btn = document.getElementById('copy-btn');
+  copyText(tok, () => {
     btn.classList.add('copied');
     btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
     setTimeout(() => {
@@ -950,8 +970,8 @@ console.log(data.tracks.items);`,
 };
 
 function copyCode(lang) {
-  navigator.clipboard.writeText(codeSamples[lang]).then(() => {
-    const btn = document.getElementById('tab-' + lang).querySelector('.code-copy');
+  const btn = document.getElementById('tab-' + lang).querySelector('.code-copy');
+  copyText(codeSamples[lang], () => {
     btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
     setTimeout(() => { btn.innerHTML = '<i class="far fa-copy"></i> Copy'; }, 2000);
   });
